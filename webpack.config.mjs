@@ -1,21 +1,14 @@
-/* eslint-env node */
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function webpackConfig(_env, { mode = "development" }) {
-  const isDevelopment = mode === "development";
-
   return {
     mode,
-    entry: "./src/index.tsx",
-    devServer: {
-      hot: true,
-    },
+    entry: "./src/index.js",
     output: {
       path: resolve(__dirname, "./dist"),
       filename: "main.js",
@@ -23,16 +16,11 @@ function webpackConfig(_env, { mode = "development" }) {
     module: {
       rules: [
         {
-          test: /\.[jt]sx?$/,
+          test: /\.js$/,
           exclude: /node_modules/,
           use: [
             {
               loader: "babel-loader",
-              options: {
-                plugins: [isDevelopment && "react-refresh/babel"].filter(
-                  Boolean
-                ),
-              },
             },
           ],
         },
@@ -43,7 +31,7 @@ function webpackConfig(_env, { mode = "development" }) {
       ],
     },
     resolve: {
-      extensions: [".tsx", ".ts", ".js"],
+      extensions: [".js"],
       symlinks: false,
     },
     plugins: [
@@ -51,12 +39,10 @@ function webpackConfig(_env, { mode = "development" }) {
         template: resolve("src", "index.html"),
       }),
       new MonacoWebpackPlugin({
-        // beware: adding further languages (like typescript) can have a dramatic impact on bundle size!
-        languages: ["cpp", "csharp", "python", "java"],
+        languages: ["cpp", "csharp"],
         features: ["find"],
       }),
-      isDevelopment && new ReactRefreshWebpackPlugin(),
-    ].filter(Boolean),
+    ],
   };
 }
 
